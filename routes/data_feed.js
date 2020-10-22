@@ -58,12 +58,11 @@ const routes = [
     handler: DataFeedController.searchAttributes,
     options: {
       auth: false,
-      description: 'Search attributes for key, value or key: value',
+      description: 'Search attributes for filter string',
       tags: ['api', 'datafeed'],
       validate: {
         payload: Joi.object({
-          key: Joi.string().allow(null),
-          value: Joi.string().allow(null),
+          filter: Joi.string(),
         }),
       },
     },

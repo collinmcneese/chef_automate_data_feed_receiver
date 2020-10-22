@@ -92,8 +92,7 @@ exports.getNodesByPlatform = async(req) => {
 // Search attributes for a key or a key/value pair
 exports.searchAttributes = async(req) => {
   try {
-    // var rKey = req.payload.key;
-    // var rValue = req.payload.value;
+    var rFilter = req.payload.filter;
     // Find a key only and return all the values
     var search = await data_feed.findAll({
       attributes: [
@@ -103,9 +102,13 @@ exports.searchAttributes = async(req) => {
         ['createdAt', 'created'],
         ['updatedAt', 'updated'],
       ],
-      // where: {
-      //   [Op.]: []
-      // },
+      where: {
+        [Op.or]: [
+          {attributes_automatic: {[Op.like]: rFilter}},
+          {attributes_normal: {[Op.like]: rFilter}},
+          {attributes_default: {[Op.like]: rFilter}},
+        ],
+      },
       raw: true,
     });
     // search.forEach(data => {
@@ -133,6 +136,7 @@ exports.addData = async(req) => {
         client_run: JSON.stringify(req.payload.client_run),
         name: req.payload.attributes.automatic.name,
         platform: req.payload.attributes.automatic.platform,
+        report: JSON.stringify(req.payload.client_run),
       },
     });
     // If record was already present (false), run update action
@@ -144,6 +148,7 @@ exports.addData = async(req) => {
         client_run: JSON.stringify(req.payload.client_run),
         name: req.payload.attributes.automatic.name,
         platform: req.payload.attributes.automatic.platform,
+        report: JSON.stringify(req.payload.client_run),
       },
       {
         where: {
