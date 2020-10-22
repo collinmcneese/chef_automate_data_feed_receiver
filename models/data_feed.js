@@ -36,6 +36,15 @@ module.exports = (sequelize, DataTypes) => {
     },
     client_run: {
       type: DataTypes.TEXT,
+      get: function() {
+        return JSON.parse(strip_json_string(this.getDataValue('client_run')));
+      },
+    },
+    report: {
+      type: DataTypes.TEXT,
+      get: function() {
+        return JSON.parse(strip_json_string(this.getDataValue('report')));
+      },
     },
     node_id: {
       type: DataTypes.STRING,

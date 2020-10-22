@@ -9,7 +9,7 @@ const routes = [
     options: {
       auth: false,
       description: 'Get all data',
-      tags: ['api', 'list'],
+      tags: ['api', 'datafeed'],
     },
   },
   {
@@ -18,8 +18,23 @@ const routes = [
     handler: DataFeedController.getNodes,
     options: {
       auth: false,
-      description: 'Get all data',
-      tags: ['api', 'list'],
+      description: 'Get node data for all nodes.',
+      tags: ['api', 'datafeed'],
+    },
+  },
+  {
+    method: 'GET',
+    path: '/datafeed/list/keys/nodes/{name}',
+    handler: DataFeedController.getObjectKeys,
+    options: {
+      auth: false,
+      description: 'Get object keys based on a provided Node name.',
+      tags: ['api', 'datafeed'],
+      validate: {
+        params: Joi.object({
+          name: Joi.string().min(1).required(),
+        }),
+      },
     },
   },
   {
@@ -29,10 +44,26 @@ const routes = [
     options: {
       auth: false,
       description: 'Get nodes by platform',
-      tags: ['api', 'list'],
+      tags: ['api', 'datafeed'],
       validate: {
         params: Joi.object({
           platform: Joi.string().min(1).required(),
+        }),
+      },
+    },
+  },
+  {
+    method: 'POST',
+    path: '/datafeed/search/attributes',
+    handler: DataFeedController.searchAttributes,
+    options: {
+      auth: false,
+      description: 'Search attributes for key, value or key: value',
+      tags: ['api', 'datafeed'],
+      validate: {
+        payload: Joi.object({
+          key: Joi.string().allow(null),
+          value: Joi.string().allow(null),
         }),
       },
     },
@@ -44,7 +75,20 @@ const routes = [
     options: {
       auth: false,
       description: 'Get all data',
-      tags: ['api', 'update'],
+      tags: ['api', 'datafeed'],
+      validate: {
+        payload: Joi.object(),
+      },
+    },
+  },
+  {
+    method: 'DELETE',
+    path: '/datafeed/purge',
+    handler: DataFeedController.delNodeData,
+    options: {
+      auth: false,
+      description: 'Delete all node data',
+      tags: ['api', 'datafeed'],
     },
   },
 ];

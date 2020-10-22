@@ -34,6 +34,7 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   dialect: 'mssql',
   dialectOptions: {
     authentication: {
+      // Uncomment this section to use NTLM authentication rather than SQL authentication.
       // type: 'ntlm',
       // options: {
       //   domain: process.env.DB_DOMAIN,
@@ -43,7 +44,7 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     },
     options: {
       encrypt: true,
-      // instanceName: process.env.DB_INSTANCE,
+      instanceName: process.env.DB_INSTANCE,
       trustedConnection: true,
       validateBulkLoadParameters: true,
     },
@@ -86,8 +87,8 @@ db
   .authenticate()
   // eslint-disable-next-line no-unused-vars
   .then(function() {
-    console.log('Database connection is established to: ' + DB_PATH);
+    console.log('Database connection is established to: ' + DB_HOST);
   }, function(err) {
-    console.log('Unable to connect to the database:' + DB_PATH, err);
+    console.log('Unable to connect to the database:' + DB_HOST, err);
   });
 module.exports = db;

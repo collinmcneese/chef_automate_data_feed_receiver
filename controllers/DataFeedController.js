@@ -39,6 +39,7 @@ exports.getNodes = async() => {
         'name',
       ],
     });
+    // console.log(Object.keys(reply[0].dataValues))
     return reply;
   } catch (err) {
     console.log(err);
@@ -46,6 +47,23 @@ exports.getNodes = async() => {
   }
 };
 
+exports.getObjectKeys = async(req) => {
+  try {
+    var rName = req.params.name;
+    var reply = await data_feed.findOne({
+      where: {
+        name: {
+          [Op.like]: rName,
+        },
+      },
+    });
+    console.log(Object.keys(reply.dataValues));
+    return Object.keys(reply.dataValues);
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
 
 exports.getNodesByPlatform = async(req) => {
   try {
@@ -65,6 +83,37 @@ exports.getNodesByPlatform = async(req) => {
       raw: true,
     });
     return reply;
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
+
+// Search attributes for a key or a key/value pair
+exports.searchAttributes = async(req) => {
+  try {
+    // var rKey = req.payload.key;
+    // var rValue = req.payload.value;
+    // Find a key only and return all the values
+    var search = await data_feed.findAll({
+      attributes: [
+        'node_id',
+        'name',
+        'platform',
+        ['createdAt', 'created'],
+        ['updatedAt', 'updated'],
+      ],
+      // where: {
+      //   [Op.]: []
+      // },
+      raw: true,
+    });
+    // search.forEach(data => {
+    //   console.log(Object.keys(data))
+    //   console.log(Object.keys(data.attributes_normal))
+    //   // console.log(data)
+    // });
+    return search;
   } catch (err) {
     console.log(err);
     throw boom.boomify(err);
@@ -103,6 +152,18 @@ exports.addData = async(req) => {
       });
     }
     return 'success';
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
+
+exports.delNodeData = async() => {
+  try {
+    var purge = await data_feed.destroy({
+      truncate: true,
+    });
+    return purge;
   } catch (err) {
     console.log(err);
     throw boom.boomify(err);
