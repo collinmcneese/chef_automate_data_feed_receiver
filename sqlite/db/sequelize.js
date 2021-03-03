@@ -12,7 +12,6 @@ dotenv.config('../.env');
 const {
   DB_PATH,
   DB_INIT,
-  DB_HOST,
 } = process.env;
 
 // Validate config options are present from .env
