@@ -22,11 +22,10 @@
     "joi": "^17.2.1",
     "json-to-pretty-yaml": "^1.2.2",
     "nodemon": "^2.0.5",
-    "npm-upgrade": "^2.0.4",
+    "npm-upgrade": "^3.0.0",
     "request-promise": "^4.2.6",
     "sequelize": "^6.3.5",
-    "sqlite3": "^5.0.0",
-    "tedious": "^9.2.1"
+    "sqlite3": "^5.0.0"
   },
   "devDependencies": {
     "eslint": "^7.11.0",
