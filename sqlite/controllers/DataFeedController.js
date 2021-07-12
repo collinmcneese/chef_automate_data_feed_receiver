@@ -34,9 +34,11 @@ exports.getNodes = async() => {
     var reply = await data_feed.findAll({
       attributes: [
         'node_id',
-        'client_run',
+        // 'client_run',
         'platform',
         'name',
+        'createdAt',
+        'updatedAt',
       ],
     });
     // console.log(Object.keys(reply[0].dataValues))
@@ -127,7 +129,7 @@ exports.addData = async(req) => {
   try {
     var reply = await data_feed.findOrCreate({
       where: {
-        node_id: req.payload.client_run.node_id,
+        node_id: req.payload.attributes.node_id,
       },
       defaults: {
         attributes_normal: JSON.stringify(req.payload.attributes.normal),
@@ -152,7 +154,7 @@ exports.addData = async(req) => {
       },
       {
         where: {
-          node_id: req.payload.client_run.node_id,
+          node_id: req.payload.attributes.node_id,
         },
       });
     }
