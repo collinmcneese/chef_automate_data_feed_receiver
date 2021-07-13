@@ -6,8 +6,12 @@ const feedSchema = new Schema({}, {strict: false}); // Allow for dynamic fields
 const Feed = mongoose.model('Feed', feedSchema);
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsdoc = require('swagger-jsdoc');
-
 const express = require('express');
+
+const api_host = 'localhost';
+const api_port = process.env.PORT || 3000;
+const mongodb_host = 'localhost';
+const mongodb_port = 27017;
 
 const swaggerOptions = {
   definition: {
@@ -24,7 +28,7 @@ const swaggerOptions = {
     },
     servers: [
       {
-        url: 'http://localhost:3000',
+        url: `http://${api_host}:${api_port}`,
       },
     ],
     paths: {
@@ -57,7 +61,7 @@ const swaggerOptions = {
 const swaggerSpecs = swaggerJsdoc(swaggerOptions);
 
 mongoose
-  .connect('mongodb://localhost:27017/datafeed', { useUnifiedTopology: true, useNewUrlParser: true })
+  .connect(`mongodb://${mongodb_host}:${mongodb_port}/datafeed`, { useUnifiedTopology: true, useNewUrlParser: true })
   .then(() => {
     const app = express();
     app.use(express.json({limit: '50mb'}));
@@ -79,9 +83,8 @@ mongoose
       });
     });
 
-    var server = app.listen(3000, function() {
-      var host = server.address().address;
+    var server = app.listen(api_port, function() {
       var port = server.address().port;
-      console.log('Example app listening at http://%s:%s', host, port);
+      console.log('Example app listening at http://%s:%s', api_host, port);
     });
   });
