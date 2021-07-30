@@ -24,6 +24,16 @@ const routes = [
   },
   {
     method: 'GET',
+    path: '/datafeed/list/node/{name}',
+    handler: DataFeedController.getNode,
+    options: {
+      auth: false,
+      description: 'Get all data for a node by name',
+      tags: ['api', 'datafeed'],
+    },
+  },
+  {
+    method: 'GET',
     path: '/datafeed/list/keys/nodes/{name}',
     handler: DataFeedController.getObjectKeys,
     options: {
@@ -73,7 +83,7 @@ const routes = [
     handler: DataFeedController.addData,
     options: {
       auth: false,
-      description: 'Get all data',
+      description: 'Add new data.',
       tags: ['api', 'datafeed'],
       validate: {
         payload: Joi.object(),

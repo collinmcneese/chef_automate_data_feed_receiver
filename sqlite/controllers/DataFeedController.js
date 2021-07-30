@@ -29,6 +29,20 @@ exports.getAllData = async() => {
   }
 };
 
+exports.getNode = async(req) => {
+  try {
+    var reply = await data_feed.findAll({
+      where: {
+        name: req.params.name.toLowerCase(),
+      },
+    });
+    return reply;
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
+
 exports.getNodes = async() => {
   try {
     var reply = await data_feed.findAll({
@@ -127,37 +141,41 @@ exports.searchAttributes = async(req) => {
 
 exports.addData = async(req) => {
   try {
-    var reply = await data_feed.findOrCreate({
-      where: {
-        node_id: req.payload.attributes.node_id,
-      },
-      defaults: {
-        attributes_normal: JSON.stringify(req.payload.attributes.normal),
-        attributes_default: JSON.stringify(req.payload.attributes.default),
-        attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
-        client_run: JSON.stringify(req.payload.client_run),
-        name: req.payload.attributes.automatic.name,
-        platform: req.payload.attributes.automatic.platform,
-        report: JSON.stringify(req.payload.client_run),
-      },
-    });
-    // If record was already present (false), run update action
-    if (reply[1] === false) {
-      await data_feed.update({
-        attributes_normal: JSON.stringify(req.payload.attributes.normal),
-        attributes_default: JSON.stringify(req.payload.attributes.default),
-        attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
-        client_run: JSON.stringify(req.payload.client_run),
-        name: req.payload.attributes.automatic.name,
-        platform: req.payload.attributes.automatic.platform,
-        report: JSON.stringify(req.payload.client_run),
-      },
-      {
+    if (req.payload.attributes) {
+      var reply = await data_feed.findOrCreate({
         where: {
           node_id: req.payload.attributes.node_id,
         },
+        defaults: {
+          attributes_normal: JSON.stringify(req.payload.attributes.normal),
+          attributes_default: JSON.stringify(req.payload.attributes.default),
+          attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
+          client_run: JSON.stringify(req.payload.client_run),
+          name: req.payload.attributes.automatic.name,
+          platform: req.payload.attributes.automatic.platform,
+          report: JSON.stringify(req.payload.client_run),
+        },
       });
-    }
+      // If record was already present (false), run update action
+      if (reply[1] === false) {
+        await data_feed.update({
+          attributes_normal: JSON.stringify(req.payload.attributes.normal),
+          attributes_default: JSON.stringify(req.payload.attributes.default),
+          attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
+          client_run: JSON.stringify(req.payload.client_run),
+          name: req.payload.attributes.automatic.name,
+          platform: req.payload.attributes.automatic.platform,
+          report: JSON.stringify(req.payload.client_run),
+        },
+        {
+          where: {
+            node_id: req.payload.attributes.node_id,
+          },
+        });
+      }
+    } else {
+      console.log('No attributes in payload were found');
+    };
     return 'success';
   } catch (err) {
     console.log(err);
