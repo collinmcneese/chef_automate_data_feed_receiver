@@ -40,6 +40,11 @@ const routes = [
       auth: false,
       description: 'Get all data for a node by name',
       tags: ['api', 'datafeed'],
+      validate: {
+        params: Joi.object({
+          name: Joi.string().min(1).required(),
+        }),
+      },
     },
   },
   {

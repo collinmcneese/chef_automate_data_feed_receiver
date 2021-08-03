@@ -42,7 +42,7 @@ exports.getAllComplianceData = async() => {
 
 exports.getNodeRun = async(req) => {
   try {
-    var rName = req.params.name;
+    // var rName = req.params.name;
     var reply = await data_feed_infra.findAll({
       where: {
         name: req.params.name.toLowerCase(),
