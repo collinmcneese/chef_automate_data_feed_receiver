@@ -9,7 +9,7 @@ const routes = [
     options: {
       auth: false,
       description: 'Get all data',
-      tags: ['api', 'datafeed'],
+      tags: ['api', 'infra'],
     },
   },
   {
@@ -19,7 +19,7 @@ const routes = [
     options: {
       auth: false,
       description: 'Get all data',
-      tags: ['api', 'datafeed'],
+      tags: ['api', 'compliance'],
     },
   },
   {
@@ -29,7 +29,7 @@ const routes = [
     options: {
       auth: false,
       description: 'Get node data for all nodes.',
-      tags: ['api', 'datafeed'],
+      tags: ['api', 'infra'],
     },
   },
   {
@@ -38,8 +38,48 @@ const routes = [
     handler: DataFeedController.getNode,
     options: {
       auth: false,
-      description: 'Get all data for a node by name',
-      tags: ['api', 'datafeed'],
+      description: 'Get all Infra data for a node by name',
+      tags: ['api', 'infra'],
+      validate: {
+        params: Joi.object({
+          name: Joi.string().min(1).required(),
+        }),
+      },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/datafeed/list/compliance/profiles',
+    handler: DataFeedController.getProfileList,
+    options: {
+      auth: false,
+      description: 'Get listing of all profiles within Compliance data',
+      tags: ['api', 'compliance'],
+    },
+  },
+  {
+    method: 'GET',
+    path: '/datafeed/list/compliance/profiles/node/{name}',
+    handler: DataFeedController.getProfileListByNode,
+    options: {
+      auth: false,
+      description: 'Get all Compliance data for a node by name',
+      tags: ['api', 'compliance'],
+      validate: {
+        params: Joi.object({
+          name: Joi.string().min(1).required(),
+        }),
+      },
+    },
+  },
+  {
+    method: 'GET',
+    path: '/datafeed/details/compliance/profiles/node/{name}',
+    handler: DataFeedController.getProfileDetailsByNode,
+    options: {
+      auth: false,
+      description: 'Get detailed Compliance data for a node by name, including Control data',
+      tags: ['api', 'compliance'],
       validate: {
         params: Joi.object({
           name: Joi.string().min(1).required(),
@@ -54,7 +94,7 @@ const routes = [
     options: {
       auth: false,
       description: 'Get object keys based on a provided Node name.',
-      tags: ['api', 'datafeed'],
+      tags: ['api', 'infra'],
       validate: {
         params: Joi.object({
           name: Joi.string().min(1).required(),
@@ -69,25 +109,10 @@ const routes = [
     options: {
       auth: false,
       description: 'Get nodes by platform',
-      tags: ['api', 'datafeed'],
+      tags: ['api', 'infra'],
       validate: {
         params: Joi.object({
           platform: Joi.string().min(1).required(),
-        }),
-      },
-    },
-  },
-  {
-    method: 'POST',
-    path: '/datafeed/search/attributes',
-    handler: DataFeedController.searchAttributes,
-    options: {
-      auth: false,
-      description: 'Search attributes for filter string',
-      tags: ['api', 'datafeed'],
-      validate: {
-        payload: Joi.object({
-          filter: Joi.string(),
         }),
       },
     },

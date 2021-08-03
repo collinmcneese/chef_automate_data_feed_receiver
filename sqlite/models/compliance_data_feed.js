@@ -22,6 +22,23 @@ module.exports = (sequelize, DataTypes) => {
     platform: {
       type: DataTypes.STRING,
     },
+    profile_name: {
+      type: DataTypes.STRING,
+    },
+    profile_full: {
+      type: DataTypes.STRING,
+    },
+    profile_status: {
+      type: DataTypes.STRING,
+    },
+    profile_controls: {
+      type: DataTypes.TEXT,
+      get: function() {
+        if (this.getDataValue('profile_controls')) {
+          return JSON.parse(strip_json_string(this.getDataValue('profile_controls')));
+        }
+      },
+    },
     report: {
       type: DataTypes.TEXT,
       get: function() {
