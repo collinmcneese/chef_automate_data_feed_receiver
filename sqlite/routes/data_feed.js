@@ -4,8 +4,18 @@ const Joi = require('joi');
 const routes = [
   {
     method: 'GET',
-    path: '/datafeed/list/all',
-    handler: DataFeedController.getAllData,
+    path: '/datafeed/list/infra/all',
+    handler: DataFeedController.getAllInfraData,
+    options: {
+      auth: false,
+      description: 'Get all data',
+      tags: ['api', 'datafeed'],
+    },
+  },
+  {
+    method: 'GET',
+    path: '/datafeed/list/compliance/all',
+    handler: DataFeedController.getAllComplianceData,
     options: {
       auth: false,
       description: 'Get all data',

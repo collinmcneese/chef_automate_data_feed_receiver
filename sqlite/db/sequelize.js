@@ -25,15 +25,18 @@ const db = new Sequelize({
 });
 
 // Load DB Models from files
-const DataFeedModel = require('../models/data_feed');
+const DataFeedInfraModel = require('../models/infra_data_feed');
+const DataFeedComplianceModel = require('../models/compliance_data_feed');
 
 // Build Model Objects from model files
-const data_feed = DataFeedModel(db, Sequelize);
+const data_feed_infra = DataFeedInfraModel(db, Sequelize);
+const data_feed_compliance = DataFeedComplianceModel(db, Sequelize);
 
 
 // Export the models so that they may be consumed by controller
 module.exports = [
-  data_feed,
+  data_feed_infra,
+  data_feed_compliance,
 ];
 
 // Create/Update DB layout from models

@@ -2,11 +2,12 @@ const boom = require('@hapi/boom');
 const db = require('../db/sequelize');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const data_feed = db.models.df_data_feed;
+const data_feed_infra = db.models.df_data_feed_infra;
+const data_feed_compliance = db.models.df_data_feed_compliance;
 
-exports.getAllData = async() => {
+exports.getAllInfraData = async() => {
   try {
-    var reply = await data_feed.findAll({});
+    var reply = await data_feed_infra.findAll({});
     // var response = [];
     // for (var object of reply) {
     //   var objectClientRun = strip_json_string(object.client_run);
@@ -29,9 +30,34 @@ exports.getAllData = async() => {
   }
 };
 
+exports.getAllComplianceData = async() => {
+  try {
+    var reply = await data_feed_compliance.findAll({});
+    return reply;
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
+
+exports.getNodeRun = async(req) => {
+  try {
+    var rName = req.params.name;
+    var reply = await data_feed_infra.findAll({
+      where: {
+        name: req.params.name.toLowerCase(),
+      },
+    });
+    return reply;
+  } catch (err) {
+    console.log(err);
+    throw boom.boomify(err);
+  }
+};
+
 exports.getNode = async(req) => {
   try {
-    var reply = await data_feed.findAll({
+    var reply = await data_feed_infra.findAll({
       where: {
         name: req.params.name.toLowerCase(),
       },
@@ -45,7 +71,7 @@ exports.getNode = async(req) => {
 
 exports.getNodes = async() => {
   try {
-    var reply = await data_feed.findAll({
+    var reply = await data_feed_infra.findAll({
       attributes: [
         'node_id',
         // 'client_run',
@@ -66,7 +92,7 @@ exports.getNodes = async() => {
 exports.getObjectKeys = async(req) => {
   try {
     var rName = req.params.name;
-    var reply = await data_feed.findOne({
+    var reply = await data_feed_infra.findOne({
       where: {
         name: {
           [Op.like]: rName,
@@ -83,7 +109,7 @@ exports.getObjectKeys = async(req) => {
 
 exports.getNodesByPlatform = async(req) => {
   try {
-    var reply = await data_feed.findAll({
+    var reply = await data_feed_infra.findAll({
       attributes: [
         'node_id',
         'name',
@@ -110,7 +136,7 @@ exports.searchAttributes = async(req) => {
   try {
     var rFilter = req.payload.filter;
     // Find a key only and return all the values
-    var search = await data_feed.findAll({
+    var search = await data_feed_infra.findAll({
       attributes: [
         'node_id',
         'name',
@@ -142,30 +168,33 @@ exports.searchAttributes = async(req) => {
 exports.addData = async(req) => {
   try {
     if (req.payload.attributes) {
-      var reply = await data_feed.findOrCreate({
+      delete (req.payload.attributes.automatic['json?']);
+      console.log(req.payload);
+      var rPlatform = req.payload.attributes.automatic.platform;
+      var node_name = req.payload.client_run.node_name;
+      var attributes_automatic = {};
+      var reply = await data_feed_infra.findOrCreate({
         where: {
           node_id: req.payload.attributes.node_id,
         },
         defaults: {
           attributes_normal: JSON.stringify(req.payload.attributes.normal),
           attributes_default: JSON.stringify(req.payload.attributes.default),
-          attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
+          attributes_automatic: JSON.stringify(attributes_automatic),
           client_run: JSON.stringify(req.payload.client_run),
-          name: req.payload.attributes.automatic.name,
-          platform: req.payload.attributes.automatic.platform,
-          report: JSON.stringify(req.payload.client_run),
+          name: node_name,
+          platform: rPlatform,
         },
       });
       // If record was already present (false), run update action
       if (reply[1] === false) {
-        await data_feed.update({
+        await data_feed_infra.update({
           attributes_normal: JSON.stringify(req.payload.attributes.normal),
           attributes_default: JSON.stringify(req.payload.attributes.default),
-          attributes_automatic: JSON.stringify(req.payload.attributes.automatic),
+          attributes_automatic: JSON.stringify(attributes_automatic),
           client_run: JSON.stringify(req.payload.client_run),
-          name: req.payload.attributes.automatic.name,
-          platform: req.payload.attributes.automatic.platform,
-          report: JSON.stringify(req.payload.client_run),
+          name: node_name,
+          platform: rPlatform,
         },
         {
           where: {
@@ -173,8 +202,12 @@ exports.addData = async(req) => {
           },
         });
       }
+    } else if (req.payload.report) {
+      console.log('Compliance-only report sent');
+      console.log(req.payload);
     } else {
-      console.log('No attributes in payload were found');
+      console.log('No report or attributes in payload were found');
+      console.log(req.payload);
     };
     return 'success';
   } catch (err) {
@@ -185,7 +218,7 @@ exports.addData = async(req) => {
 
 exports.delNodeData = async() => {
   try {
-    var purge = await data_feed.destroy({
+    var purge = await data_feed_infra.destroy({
       truncate: true,
     });
     return purge;
