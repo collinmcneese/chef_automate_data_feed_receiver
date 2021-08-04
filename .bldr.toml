@@ -1,0 +1,4 @@
+[automate-data-feed-receiver-pgsql]
+plan_path = "pgsql"
+[automate-data-feed-receiver-sqlite]
+plan_path = "sqlite"
