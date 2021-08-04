@@ -163,6 +163,9 @@ exports.getComplianceNodeList = async(req) => {
     for (var n of node_list_raw) {
       node_list.push(n.name);
     }
+    node_list = node_list.filter(function(item, pos) {
+      return node_list.indexOf(item) === pos;
+    });
     return node_list;
   } catch (err) {
     console.log(err);
