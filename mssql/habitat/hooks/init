@@ -1,0 +1,4 @@
+#!/bin/bash
+
+# Move configuration `.env` file to correct svc location
+cp -f {{pkg.svc_config_path}}/env_template {{pkg.path}}/app/.env

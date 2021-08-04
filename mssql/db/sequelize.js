@@ -22,12 +22,6 @@ const {
 assert(DB_PATH, 'DB_PATH configuration is required.');
 
 // Load DB Configuration
-// SQLite config
-// const db = new Sequelize({
-//   dialect: 'sqlite',
-//   storage: DB_PATH,
-// });
-
 // Example connection using MSSQL
 const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   host: DB_HOST,
@@ -50,7 +44,7 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     },
   },
   pool: {
-    max: 50,
+    max: 100,
     min: 1,
     acquire: 30000,
     idle: 2000,
@@ -59,15 +53,18 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
 });
 
 // Load DB Models from files
-const DataFeedModel = require('../models/data_feed');
+const DataFeedInfraModel = require('../models/infra_data_feed');
+const DataFeedComplianceModel = require('../models/compliance_data_feed');
 
 // Build Model Objects from model files
-const data_feed = DataFeedModel(db, Sequelize);
+const data_feed_infra = DataFeedInfraModel(db, Sequelize);
+const data_feed_compliance = DataFeedComplianceModel(db, Sequelize);
 
 
 // Export the models so that they may be consumed by controller
 module.exports = [
-  data_feed,
+  data_feed_infra,
+  data_feed_compliance,
 ];
 
 // Create/Update DB layout from models

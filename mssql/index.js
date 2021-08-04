@@ -75,12 +75,16 @@ assert(API_BIND_IP, 'API_BIND_IP configuration is required.');
     },
     tags: [
       {
-        name: 'list',
-        description: 'Endpoints for querying data.',
+        name: 'infra',
+        description: 'Endpoints for interacting with stored Chef Infra data.',
       },
       {
-        name: 'update',
-        description: 'Endpoints for updating data.',
+        name: 'compliance',
+        description: 'Endpoints for interacting with stored Chef InSpec compliance data.',
+      },
+      {
+        name: 'datafeed',
+        description: 'Endpoints for loading data to API.',
       },
     ],
     externalDocs: {
