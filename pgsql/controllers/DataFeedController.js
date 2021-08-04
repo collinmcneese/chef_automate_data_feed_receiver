@@ -190,7 +190,10 @@ exports.getComplianceDetailsByNode = async(req) => {
         'profile_name',
         'profile_full',
         'profile_status',
-        'profile_controls',
+        'control_name',
+        'control_title',
+        'control_waived',
+        'control_results',
         'createdAt',
         'updatedAt',
       ],
@@ -217,7 +220,10 @@ exports.getComplianceDetailsByNodeList = async(req) => {
         'profile_name',
         'profile_full',
         'profile_status',
-        'profile_controls',
+        'control_name',
+        'control_title',
+        'control_waived',
+        'control_results',
         'createdAt',
         'updatedAt',
       ],
@@ -280,35 +286,43 @@ exports.addData = async(req) => {
         for (var control of rProfile_controls) {
           delete control.code;
           delete control.desc;
-        }
-        var reply_compliance = await data_feed_compliance.findOrCreate({
-          where: {
-            node_id: req.payload.report.node_id,
-            profile_name: profile.name,
-          },
-          defaults: {
-            name: rNode_name,
-            platform: rPlatform_name,
-            profile_name: rProfile_name,
-            profile_full: rProfile_name_full,
-            profile_status: rProfile_status,
-            profile_controls: JSON.stringify(rProfile_controls),
-          },
-        });
-        // If record was already present (false), run update action
-        if (reply_compliance[1] === false) {
-          await data_feed_compliance.update({
-            profile_full: rProfile_name_full,
-            profile_status: rProfile_status,
-            profile_controls: JSON.stringify(rProfile_controls),
-            platform: rPlatform_name,
-          },
-          {
+          var reply_compliance = await data_feed_compliance.findOrCreate({
             where: {
               node_id: req.payload.report.node_id,
               profile_name: profile.name,
+              control_name: control.id,
+            },
+            defaults: {
+              name: rNode_name,
+              platform: rPlatform_name,
+              profile_name: rProfile_name,
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
             },
           });
+          // If record was already present (false), run update action
+          if (reply_compliance[1] === false) {
+            await data_feed_compliance.update({
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
+              platform: rPlatform_name,
+            },
+            {
+              where: {
+                node_id: req.payload.report.node_id,
+                profile_name: profile.name,
+                control_name: control.id,
+              },
+            });
+          };
         }
       }
     } else {

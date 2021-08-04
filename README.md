@@ -6,6 +6,7 @@ DB Backend configuration options available for:
 
 * [MSSQL](mssql/README.md)
 * [SQLITE](sqlite/README.md)
+* [PostgreSQL](pgsql/README.md)
 
 ```toml
 # Example toml configuration to patch for Chef Automate

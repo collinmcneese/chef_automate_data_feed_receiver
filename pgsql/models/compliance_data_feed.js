@@ -31,19 +31,20 @@ module.exports = (sequelize, DataTypes) => {
     profile_status: {
       type: DataTypes.STRING,
     },
-    profile_controls: {
-      type: DataTypes.TEXT,
-      get: function() {
-        if (this.getDataValue('profile_controls')) {
-          return JSON.parse(strip_json_string(this.getDataValue('profile_controls')));
-        }
-      },
+    control_name: {
+      type: DataTypes.STRING,
     },
-    report: {
+    control_title: {
+      type: DataTypes.STRING,
+    },
+    control_waived: {
+      type: DataTypes.STRING,
+    },
+    control_results: {
       type: DataTypes.TEXT,
       get: function() {
-        if (this.getDataValue('report')) {
-          return JSON.parse(strip_json_string(this.getDataValue('report')));
+        if (this.getDataValue('control_results')) {
+          return JSON.parse(strip_json_string(this.getDataValue('control_results')));
         }
       },
     },
