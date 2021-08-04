@@ -1,0 +1,14 @@
+# Use this file to templatize your application's native configuration files.
+# See the docs at https://www.habitat.sh/docs/create-packages-configure/.
+# You can safely delete this file if you don't need it.
+
+[hapi]
+API_BIND_IP="'0.0.0.0'"
+API_BIND_PORT="'3000'"
+API_EXTERNAL_HOST=""
+API_EXTERNAL_PORT="3000"
+
+[db]
+DB_PATH="'db/dev_database.sqlite'"
+DB_NAME="datafeed_dev"
+DB_INIT="true"

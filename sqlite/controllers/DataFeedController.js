@@ -52,16 +52,20 @@ exports.getInfraNode = async(req) => {
 
 exports.getInfraNodeList = async() => {
   try {
-    var reply = await data_feed_infra.findAll({
+    var node_list_raw = await data_feed_infra.findAll({
       attributes: [
-        'node_id',
-        'platform',
         'name',
-        'createdAt',
-        'updatedAt',
       ],
+      raw: true,
     });
-    return reply;
+    var node_list = [];
+    for (var n of node_list_raw) {
+      node_list.push(n.name);
+    }
+    node_list = node_list.filter(function(item, pos) {
+      return node_list.indexOf(item) === pos;
+    });
+    return node_list;
   } catch (err) {
     console.log(err);
     throw boom.boomify(err);

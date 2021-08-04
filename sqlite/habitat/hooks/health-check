@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# Set variable to good status
+rc=0
+
+# Test to see if application is running
+curl -sq http://{{cfg.hapi.API_BIND_IP}}:{{cfg.hapi.API_BIND_PORT}}/documentation > /dev/null
+
+# Set rc based on reply of curl-test
+case $? in
+  0)
+    rc=0 ;;
+  *)
+    rc=2 ;;
+esac
+
+# If curl-test response is non-zero, restart the application by touching `app/restart.js`
+if [[ $rc != 0 ]] ; then touch {{ pkg.path }}/app/restart.js ; fi
+
+# Exit with response code
+exit $rc

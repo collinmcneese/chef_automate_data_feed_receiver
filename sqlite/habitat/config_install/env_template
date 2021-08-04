@@ -1,0 +1,7 @@
+DB_PATH={{cfg.db.DB_PATH}}
+DB_NAME={{cfg.db.DB_NAME}}
+DB_INIT={{cfg.db.DB_INIT}}
+API_BIND_IP={{cfg.hapi.API_BIND_IP}}
+API_BIND_PORT={{cfg.hapi.API_BIND_PORT}}
+API_EXTERNAL_HOST={{cfg.hapi.API_EXTERNAL_HOST}}
+API_EXTERNAL_PORT={{cfg.hapi.API_EXTERNAL_PORT}}
