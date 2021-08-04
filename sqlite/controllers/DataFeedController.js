@@ -272,6 +272,11 @@ exports.addData = async(req) => {
         var rProfile_name_full = profile.full;
         var rProfile_controls = profile.controls || [];
         var rProfile_status = profile.status;
+        // Delete the control code and desc blocks from the object
+        for (var control of rProfile_controls) {
+          delete control.code;
+          delete control.desc;
+        }
         var reply_compliance = await data_feed_compliance.findOrCreate({
           where: {
             node_id: req.payload.report.node_id,
