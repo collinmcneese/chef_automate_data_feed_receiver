@@ -16,13 +16,13 @@ DB Backend configuration options available for:
 
 [data_feed_service.v1.sys]
   [data_feed_service.v1.sys.service]
-        feed_interval = "1m"
-        node_batch_size = 50
-        updated_nodes_only = true
-        disable_cidr_filter = true
-        cidr_filter = "0.0.0.0/0"
-        accepted_status_codes = [200, 201, 202, 203, 204]
-      [data_feed_service.v1.sys.log]
-        level = "info"
-
+    feed_interval = "1m"
+    # Use a batch size of one for proper parsing on API ingest due to format of batch requests
+    node_batch_size = 1
+    updated_nodes_only = true
+    disable_cidr_filter = true
+    cidr_filter = "0.0.0.0/0"
+    accepted_status_codes = [200, 201, 202, 203, 204]
+    [data_feed_service.v1.sys.log]
+    level = "info"
 ```
