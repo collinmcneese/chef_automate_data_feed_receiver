@@ -1,90 +1,121 @@
-// /* eslint-disable max-len */
+/* eslint-disable max-len */
 
-const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-const feedSchema = new Schema({}, {strict: false}); // Allow for dynamic fields
-const Feed = mongoose.model('Feed', feedSchema);
-const swaggerUi = require('swagger-ui-express');
-const swaggerJsdoc = require('swagger-jsdoc');
-const express = require('express');
+// Load Dependencies
+const Hapi = require('@hapi/hapi');
+const boom = require('@hapi/boom');
+const assert = require('assert');
+const dotenv = require('dotenv');
+// Swagger dependencies
+const Inert = require('@hapi/inert');
+const Vision = require('@hapi/vision');
+const HapiSwagger = require('hapi-swagger');
+const Pack = require('./package');
 
-const api_host = 'localhost';
-const api_port = process.env.PORT || 3000;
-const mongodb_host = 'localhost';
-const mongodb_port = 27017;
+// Load environment settings using dotenv
+assert('./.env', '.env File is required at the root directory, see ".env.example"');
+dotenv.config();
+const {
+  API_BIND_PORT,
+  API_BIND_IP,
+  API_EXTERNAL_HOST,
+  API_EXTERNAL_PORT,
+} = process.env;
 
-const swaggerOptions = {
-  definition: {
-    openapi: '3.0.0',
-    info: {
-      title: 'Data Feed Receiver API',
-      version: '0.0.1',
-      description:
-        'Simple CRUD API to receive Chef Infra Client node and Chef Automate Data Feed information.',
-      license: {
-        name: 'Apache-2.0',
-        url: 'https://spdx.org/licenses/Apache-2.0.html',
-      },
+// Validate config options are present from .env
+assert(API_BIND_PORT, 'API_BIND_PORT configuration is required.');
+assert(API_BIND_IP, 'API_BIND_IP configuration is required.');
+
+// Launch HAPI server
+(async() => {
+  const server = await new Hapi.Server({
+    host: API_BIND_IP,
+    port: API_BIND_PORT,
+    routes: {
+      cors: true,
     },
-    servers: [
+  });
+  // Configure HAPI base logging
+  server.events.on('log', (event, tags) => {
+    if (tags.error) {
+      console.log(`Server error: ${event.error ? event.error.message : 'unknown'}`);
+    }
+  });
+
+  // Stubbing a local user here for local dev purposes.
+  const users = {
+    df: {
+      username: 'df',
+      password: 'df',
+      name: 'data_feed',
+      id: '1',
+    },
+  };
+
+  const validate = async(request, username, password) => {
+    var user = users[username];
+    if (!user) {
+      return { credentials: null, isValid: false };
+    }
+    var isValid = true;
+    var credentials = { id: user.id, name: user.name };
+    return { isValid, credentials };
+  };
+
+  await server.register(require('@hapi/basic'));
+  server.auth.strategy('simple', 'basic', { validate });
+
+  // Configure Swagger
+  const swaggerOptions = {
+    info: {
+      title: 'DataFeed API',
+      // eslint-disable-next-line no-multi-str
+      description: 'Swagger Documentation for Data Feed API which \
+      consumes and serves data sent from Chef Automate Data Feed \r\n',
+      version: Pack.version,
+    },
+    tags: [
       {
-        url: `http://${api_host}:${api_port}`,
+        name: 'list',
+        description: 'Endpoints for querying data.',
+      },
+      {
+        name: 'update',
+        description: 'Endpoints for updating data.',
       },
     ],
-    paths: {
-      '/datafeed/get': {
-        get: {
-          tags: ['Data Feed'],
-          responses: {
-            200: {},
-          },
-        },
-      },
-      '/datafeed/add': {
-        post: {
-          tags: ['Data Feed'],
-          requestBody: {
-            content: {
-              'application/json': {},
-            },
-          },
-          responses: {
-            200: {},
-          },
-        },
-      },
+    externalDocs: {
+      url: 'https://swagger.io',
+      description: 'Find more info here',
     },
-  },
-  apis: ['index.js'],
-};
+    grouping: 'tags',
+    sortEndpoints: 'ordered',
+    host: API_EXTERNAL_HOST + ':' + API_EXTERNAL_PORT,
+    validatorUrl: null,
+    schemes: ['http', 'https'],
+    consumes: ['application/json'],
+    produces: ['application/json'],
+  };
+  await server.register([
+    Inert,
+    Vision,
+    {
+      plugin: HapiSwagger,
+      options: swaggerOptions,
+    },
+  ]);
 
-const swaggerSpecs = swaggerJsdoc(swaggerOptions);
-
-mongoose
-  .connect(`mongodb://${mongodb_host}:${mongodb_port}/datafeed`, { useUnifiedTopology: true, useNewUrlParser: true })
-  .then(() => {
-    const app = express();
-    app.use(express.json({limit: '50mb'}));
-    app.use(express.urlencoded({limit: '50mb', extended: true}));
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
-
-    app.post('/datafeed/add', async(req, res) => {
-      req.body;
-      console.log(req.body);
-      const post = new Feed(req.body);
-      // TODO: Transform the keys with dots rather than turning off checkKeys
-      await post.save({checkKeys: false});
-      res.send('ok\n');
-    });
-
-    app.get('/datafeed/get', async(req, res) => {
-      Feed.find({}).then(function(feed) {
-        res.send(feed);
-      });
-    });
-
-    var server = app.listen(api_port, function() {
-      var port = server.address().port;
-      console.log('Example app listening at http://%s:%s', api_host, port);
-    });
+  // Process routes
+  const routes = require('./routes');
+  routes.forEach((route) => {
+    server.route(route);
   });
+
+  // Launch Server
+  try {
+    await server.start();
+    console.log('Server running at:', server.info.uri);
+  } catch (err) {
+    console.log(err);
+    boom.boomify(err);
+  }
+})();
