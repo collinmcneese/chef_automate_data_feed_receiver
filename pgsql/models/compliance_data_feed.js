@@ -40,6 +40,9 @@ module.exports = (sequelize, DataTypes) => {
     control_waived: {
       type: DataTypes.STRING,
     },
+    control_status: {
+      type: DataTypes.STRING,
+    },
     control_results: {
       type: DataTypes.TEXT,
       get: function() {

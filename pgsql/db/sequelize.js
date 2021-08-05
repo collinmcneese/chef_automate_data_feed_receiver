@@ -28,6 +28,7 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   dialectOptions: {
     // Your pg options here
   },
+  logging: false,
 });
 
 // Load DB Models from files
