@@ -49,7 +49,7 @@ const db = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
     acquire: 30000,
     idle: 2000,
   },
-  logging: true,
+  logging: false,
 });
 
 // Load DB Models from files

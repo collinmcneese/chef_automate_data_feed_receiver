@@ -11,6 +11,17 @@ function countInArray(array, value) {
 function onlyUnique(value, index, self) {
   return self.indexOf(value) === index;
 }
+function controlStatus(control_data) {
+  if (control_data.includes('"status":"failed"')) {
+    return 'failed';
+  } else if (control_data.includes('"status":"passed"')) {
+    return 'passed';
+  } else if (control_data.includes('"status":"skipped"')) {
+    return 'skipped';
+  } else {
+    return null;
+  }
+};
 
 exports.getAllInfraData = async() => {
   try {
@@ -190,7 +201,10 @@ exports.getComplianceDetailsByNode = async(req) => {
         'profile_name',
         'profile_full',
         'profile_status',
-        'profile_controls',
+        'control_name',
+        'control_title',
+        'control_waived',
+        'control_results',
         'createdAt',
         'updatedAt',
       ],
@@ -217,7 +231,10 @@ exports.getComplianceDetailsByNodeList = async(req) => {
         'profile_name',
         'profile_full',
         'profile_status',
-        'profile_controls',
+        'control_name',
+        'control_title',
+        'control_waived',
+        'control_results',
         'createdAt',
         'updatedAt',
       ],
@@ -233,8 +250,8 @@ exports.getComplianceDetailsByNodeList = async(req) => {
 exports.addData = async(req) => {
   try {
     if (req.payload.attributes) {
+      console.log('Chef Infra report sent');
       delete (req.payload.attributes.automatic['json?']);
-      console.log(req.payload);
       var rPlatform = req.payload.attributes.automatic.platform;
       var node_name = req.payload.client_run.node_name;
       var attributes_automatic = {};
@@ -268,7 +285,7 @@ exports.addData = async(req) => {
         });
       }
     } else if (req.payload.report) {
-      console.log('Compliance-only report sent');
+      console.log('Chef InSpec Compliance-only report sent');
       for (var profile of req.payload.report.profiles) {
         var rPlatform_name = req.payload.report.platform.name;
         var rNode_name = req.payload.report.node_name;
@@ -280,35 +297,47 @@ exports.addData = async(req) => {
         for (var control of rProfile_controls) {
           delete control.code;
           delete control.desc;
-        }
-        var reply_compliance = await data_feed_compliance.findOrCreate({
-          where: {
-            node_id: req.payload.report.node_id,
-            profile_name: profile.name,
-          },
-          defaults: {
-            name: rNode_name,
-            platform: rPlatform_name,
-            profile_name: rProfile_name,
-            profile_full: rProfile_name_full,
-            profile_status: rProfile_status,
-            profile_controls: JSON.stringify(rProfile_controls),
-          },
-        });
-        // If record was already present (false), run update action
-        if (reply_compliance[1] === false) {
-          await data_feed_compliance.update({
-            profile_full: rProfile_name_full,
-            profile_status: rProfile_status,
-            profile_controls: JSON.stringify(rProfile_controls),
-            platform: rPlatform_name,
-          },
-          {
+          var rControl_status_json = JSON.stringify(control.results);
+          var rControl_status = controlStatus(rControl_status_json);
+          var reply_compliance = await data_feed_compliance.findOrCreate({
             where: {
               node_id: req.payload.report.node_id,
               profile_name: profile.name,
+              control_name: control.id,
+            },
+            defaults: {
+              name: rNode_name,
+              platform: rPlatform_name,
+              profile_name: rProfile_name,
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_status: rControl_status,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
             },
           });
+          // If record was already present (false), run update action
+          if (reply_compliance[1] === false) {
+            await data_feed_compliance.update({
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_status: rControl_status,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
+              platform: rPlatform_name,
+            },
+            {
+              where: {
+                node_id: req.payload.report.node_id,
+                profile_name: profile.name,
+                control_name: control.id,
+              },
+            });
+          };
         }
       }
     } else {

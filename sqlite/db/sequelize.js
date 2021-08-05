@@ -22,6 +22,7 @@ assert(DB_PATH, 'DB_PATH configuration is required.');
 const db = new Sequelize({
   dialect: 'sqlite',
   storage: DB_PATH,
+  logging: false,
 });
 
 // Load DB Models from files
