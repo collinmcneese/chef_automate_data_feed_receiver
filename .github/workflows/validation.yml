@@ -11,8 +11,8 @@
       runs-on: ubuntu-latest
       strategy:
         matrix:
-          path: ['mssql', 'sqlite']
-          node-version: [12.x, 14.x, 15.x]
+          path: ['mssql', 'sqlite', 'pgsql']
+          node-version: [12.x, 14.x, 15.x, 16.x]
       steps:
         - uses: actions/checkout@v2
         - name: Use Node.js ${{ matrix.node-version }}
