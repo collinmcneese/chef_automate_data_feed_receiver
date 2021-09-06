@@ -96,7 +96,7 @@ assert(API_BIND_IP, 'API_BIND_IP configuration is required.');
     host: API_EXTERNAL_HOST + ':' + API_EXTERNAL_PORT,
     validatorUrl: null,
     schemes: ['http', 'https'],
-    consumes: ['application/json'],
+    consumes: ['application/json', 'application/ndjson', 'application/jsonl', 'application/x-ndjson'],
     produces: ['application/json'],
   };
   await server.register([

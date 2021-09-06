@@ -248,7 +248,12 @@ exports.getComplianceDetailsByNodeList = async(req) => {
 
 // Data Feed Base Functions
 exports.addData = async(req) => {
+  if (req.payload.dataStream) {
+    console.log('has datastream');
+    console.log(req.payload.dataStream);
+  };
   try {
+    console.log(req.payload);
     if (req.payload.attributes) {
       console.log('Chef Infra report sent');
       delete (req.payload.attributes.automatic['json?']);
