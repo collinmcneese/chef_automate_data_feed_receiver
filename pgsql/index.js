@@ -118,6 +118,7 @@ assert(API_BIND_IP, 'API_BIND_IP configuration is required.');
   try {
     await server.start();
     console.log('Server running at:', server.info.uri);
+    console.log('Check out the API Documentation page:', server.info.uri + '/documentation');
   } catch (err) {
     console.log(err);
     boom.boomify(err);

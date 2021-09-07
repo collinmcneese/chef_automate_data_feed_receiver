@@ -240,7 +240,6 @@ exports.getProfileList = async(req) => {
     for (var profile of profile_list_raw) {
       profile_list.push(profile.profile_name);
     }
-    console.log(profile_list);
     for (var p of profile_list.filter(onlyUnique)) {
       reply[p] = countInArray(profile_list, p);
     }
@@ -363,13 +362,6 @@ exports.getComplianceDetailsByNodeList = async(req) => {
 
 // Data Feed Base Functions
 exports.addData = async(req) => {
-  // var payload = await req.payload.pipe(ndjson.parse())
-  // payload.on('finish', (f) => console.log('finish happened'))
-  // payload.on('end', (f) => console.log('end happened'))
-  // payload.on('data', (d) => {
-  //       addData(d);
-  //    });
-  // return 'success'
   const stream = await req.payload;
   const chunks = [];
   for await (let chunk of stream) {
