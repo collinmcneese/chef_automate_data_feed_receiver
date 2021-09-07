@@ -5,6 +5,14 @@ const Op = Sequelize.Op;
 const data_feed_infra = db.models.df_infra_data_feed;
 const data_feed_compliance = db.models.df_compliance_data_feed;
 
+function ndjsonParse(jsonString) {
+  const type = typeof jsonString;
+  if (type === 'string') {
+    const jsonRows = jsonString.split(/\n|\n\r/).filter(Boolean);
+    return jsonRows.map(jsonStringRow => JSON.parse(jsonStringRow));
+  }
+};
+
 function countInArray(array, value) {
   return array.reduce((n, x) => n + (x === value), 0);
 }
@@ -22,6 +30,107 @@ function controlStatus(control_data) {
     return null;
   }
 };
+
+async function addData(data) {
+  try {
+    if (data.attributes) {
+      console.log('Chef Infra report sent');
+      delete (data.attributes.automatic['json?']);
+      var rPlatform = data.attributes.automatic.platform;
+      var node_name = data.client_run.node_name;
+      var attributes_automatic = {};
+      var reply = await data_feed_infra.findOrCreate({
+        where: {
+          node_id: data.attributes.node_id,
+        },
+        defaults: {
+          attributes_normal: JSON.stringify(data.attributes.normal),
+          attributes_default: JSON.stringify(data.attributes.default),
+          attributes_automatic: JSON.stringify(attributes_automatic),
+          client_run: JSON.stringify(data.client_run),
+          name: node_name,
+          platform: rPlatform,
+        },
+      });
+      // If record was already present (false), run update action
+      if (reply[1] === false) {
+        await data_feed_infra.update({
+          attributes_normal: JSON.stringify(data.attributes.normal),
+          attributes_default: JSON.stringify(data.attributes.default),
+          attributes_automatic: JSON.stringify(attributes_automatic),
+          client_run: JSON.stringify(data.client_run),
+          name: node_name,
+          platform: rPlatform,
+        },
+        {
+          where: {
+            node_id: data.attributes.node_id,
+          },
+        });
+      };
+    };
+    if (data.report) {
+      console.log('Chef InSpec Compliance report sent');
+      for (var profile of data.report.profiles) {
+        var rPlatform_name = data.report.platform.name;
+        var rNode_name = data.report.node_name;
+        var rProfile_name = profile.name;
+        var rProfile_name_full = profile.full;
+        var rProfile_controls = profile.controls || [];
+        var rProfile_status = profile.status;
+        // Delete the control code and desc blocks from the object
+        for (var control of rProfile_controls) {
+          delete control.code;
+          delete control.desc;
+          var rControl_status_json = JSON.stringify(control.results);
+          var rControl_status = controlStatus(rControl_status_json);
+          var reply_compliance = await data_feed_compliance.findOrCreate({
+            where: {
+              node_id: data.report.node_id,
+              profile_name: profile.name,
+              control_name: control.id,
+            },
+            defaults: {
+              name: rNode_name,
+              platform: rPlatform_name,
+              profile_name: rProfile_name,
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_status: rControl_status,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
+            },
+          });
+          // If record was already present (false), run update action
+          if (reply_compliance[1] === false) {
+            await data_feed_compliance.update({
+              profile_full: rProfile_name_full,
+              profile_status: rProfile_status,
+              control_name: control.id,
+              control_title: control.title,
+              control_status: rControl_status,
+              control_results: JSON.stringify(control.results),
+              control_waived: control.waived_str,
+              platform: rPlatform_name,
+            },
+            {
+              where: {
+                node_id: data.report.node_id,
+                profile_name: profile.name,
+                control_name: control.id,
+              },
+            });
+          };
+        }
+      }
+    };
+  } catch (err) {
+    return err;
+  }
+  return 'success';
+}
 
 exports.getAllInfraData = async() => {
   try {
@@ -76,7 +185,7 @@ exports.getInfraNodeList = async() => {
     node_list = node_list.filter(function(item, pos) {
       return node_list.indexOf(item) === pos;
     });
-    return node_list;
+    return node_list.sort();
   } catch (err) {
     console.log(err);
     throw boom.boomify(err);
@@ -148,6 +257,14 @@ exports.getProfileListByNode = async(req) => {
       where: {
         name: req.params.name,
       },
+      group: [
+        'node_id',
+        'platform',
+        'name',
+        'profile_name',
+        'profile_full',
+        'profile_status',
+      ],
       attributes: [
         'node_id',
         'platform',
@@ -155,8 +272,6 @@ exports.getProfileListByNode = async(req) => {
         'profile_name',
         'profile_full',
         'profile_status',
-        'createdAt',
-        'updatedAt',
       ],
     });
     return reply;
@@ -181,7 +296,7 @@ exports.getComplianceNodeList = async(req) => {
     node_list = node_list.filter(function(item, pos) {
       return node_list.indexOf(item) === pos;
     });
-    return node_list;
+    return node_list.sort();
   } catch (err) {
     console.log(err);
     throw boom.boomify(err);
@@ -248,107 +363,24 @@ exports.getComplianceDetailsByNodeList = async(req) => {
 
 // Data Feed Base Functions
 exports.addData = async(req) => {
-  try {
-    if (req.payload.attributes) {
-      console.log('Chef Infra report sent');
-      delete (req.payload.attributes.automatic['json?']);
-      var rPlatform = req.payload.attributes.automatic.platform;
-      var node_name = req.payload.client_run.node_name;
-      var attributes_automatic = {};
-      var reply = await data_feed_infra.findOrCreate({
-        where: {
-          node_id: req.payload.attributes.node_id,
-        },
-        defaults: {
-          attributes_normal: JSON.stringify(req.payload.attributes.normal),
-          attributes_default: JSON.stringify(req.payload.attributes.default),
-          attributes_automatic: JSON.stringify(attributes_automatic),
-          client_run: JSON.stringify(req.payload.client_run),
-          name: node_name,
-          platform: rPlatform,
-        },
-      });
-      // If record was already present (false), run update action
-      if (reply[1] === false) {
-        await data_feed_infra.update({
-          attributes_normal: JSON.stringify(req.payload.attributes.normal),
-          attributes_default: JSON.stringify(req.payload.attributes.default),
-          attributes_automatic: JSON.stringify(attributes_automatic),
-          client_run: JSON.stringify(req.payload.client_run),
-          name: node_name,
-          platform: rPlatform,
-        },
-        {
-          where: {
-            node_id: req.payload.attributes.node_id,
-          },
-        });
-      }
-    } else if (req.payload.report) {
-      console.log('Chef InSpec Compliance-only report sent');
-      for (var profile of req.payload.report.profiles) {
-        var rPlatform_name = req.payload.report.platform.name;
-        var rNode_name = req.payload.report.node_name;
-        var rProfile_name = profile.name;
-        var rProfile_name_full = profile.full;
-        var rProfile_controls = profile.controls || [];
-        var rProfile_status = profile.status;
-        // Delete the control code and desc blocks from the object
-        for (var control of rProfile_controls) {
-          delete control.code;
-          delete control.desc;
-          var rControl_status_json = JSON.stringify(control.results);
-          var rControl_status = controlStatus(rControl_status_json);
-          var reply_compliance = await data_feed_compliance.findOrCreate({
-            where: {
-              node_id: req.payload.report.node_id,
-              profile_name: profile.name,
-              control_name: control.id,
-            },
-            defaults: {
-              name: rNode_name,
-              platform: rPlatform_name,
-              profile_name: rProfile_name,
-              profile_full: rProfile_name_full,
-              profile_status: rProfile_status,
-              control_name: control.id,
-              control_title: control.title,
-              control_status: rControl_status,
-              control_results: JSON.stringify(control.results),
-              control_waived: control.waived_str,
-            },
-          });
-          // If record was already present (false), run update action
-          if (reply_compliance[1] === false) {
-            await data_feed_compliance.update({
-              profile_full: rProfile_name_full,
-              profile_status: rProfile_status,
-              control_name: control.id,
-              control_title: control.title,
-              control_status: rControl_status,
-              control_results: JSON.stringify(control.results),
-              control_waived: control.waived_str,
-              platform: rPlatform_name,
-            },
-            {
-              where: {
-                node_id: req.payload.report.node_id,
-                profile_name: profile.name,
-                control_name: control.id,
-              },
-            });
-          };
-        }
-      }
-    } else {
-      console.log('No report or attributes in payload were found');
-      console.log(req.payload);
-    };
-    return 'success';
-  } catch (err) {
-    console.log(err);
-    throw boom.boomify(err);
+  // var payload = await req.payload.pipe(ndjson.parse())
+  // payload.on('finish', (f) => console.log('finish happened'))
+  // payload.on('end', (f) => console.log('end happened'))
+  // payload.on('data', (d) => {
+  //       addData(d);
+  //    });
+  // return 'success'
+  const stream = await req.payload;
+  const chunks = [];
+  for await (let chunk of stream) {
+    chunks.push(chunk);
   }
+  const buffer = Buffer.concat(chunks);
+  const str = buffer.toString('utf-8');
+  for (var row of ndjsonParse(str)) {
+    addData(row);
+  }
+  return 'success';
 };
 
 exports.delNodeData = async() => {

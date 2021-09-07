@@ -1,6 +1,10 @@
 const DataFeedController = require('../controllers/DataFeedController');
 const Joi = require('joi');
 
+// const handleError = function(request, h, err) {
+//   throw err;
+// };
+
 const routes = [
   // Data Feed base routes
   {
@@ -11,8 +15,10 @@ const routes = [
       auth: false,
       description: 'Add new data.',
       tags: ['api', 'datafeed'],
-      validate: {
-        payload: Joi.object(),
+      payload: {
+        maxBytes: 100 * 1024 * 1024,
+        parse: true,
+        output: 'stream',
       },
     },
   },
