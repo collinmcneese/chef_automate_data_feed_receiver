@@ -1,7 +1,5 @@
 // data_feed_infra table
 function strip_json_string(json) {
-  // return json.replace(/\\/g, '').replace(/"{/, '{').replace(/}"/, '}');
-  // cat client_run.json | sed 's/^"//' | sed 's/"$//' | sed 's/\\"/"/g' | sed 's/\\\\/\\/g' | jq
   json.replace(/^"/, '');
   json.replace(/"$/, '');
   json.replace(/\\"/g, '"');
@@ -65,5 +63,17 @@ module.exports = (sequelize, DataTypes) => {
     node_id: {
       type: DataTypes.STRING,
     },
+  },
+  {
+    indexes: [
+      {
+        unique: false,
+        fields: ['node_id'],
+      },
+      {
+        unique: false,
+        fields: ['name'],
+      },
+    ],
   });
 };

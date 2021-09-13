@@ -54,5 +54,17 @@ module.exports = (sequelize, DataTypes) => {
     node_id: {
       type: DataTypes.STRING,
     },
+  },
+  {
+    indexes: [
+      {
+        unique: false,
+        fields: [
+          'node_id',
+          'profile_name',
+          'control_name',
+        ],
+      },
+    ],
   });
 };
