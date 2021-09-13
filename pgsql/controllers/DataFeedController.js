@@ -370,7 +370,7 @@ exports.addData = async(req) => {
   const buffer = Buffer.concat(chunks);
   const str = buffer.toString('utf-8');
   for (var row of ndjsonParse(str)) {
-    addData(row);
+    await addData(row);
   }
   return 'success';
 };
