@@ -2,13 +2,14 @@
 
 Simple CRUD API to consume and fetch data which is sent from the Chef Automate "data feed" feature. [docs](https://docs.chef.io/automate/datafeed/)
 
-* Built with Sqlite backend for test purposes but uses Sequelize for database operations so would support any back-end which Sequelize works with.
+* Built with sqlite3 backend for test purposes but uses Sequelize for database operations so would support any back-end which Sequelize works with.
 
 ## Local Development
 
 ### Requirements
 
 * Node.JS
+* sqlite3
 
 ### Initial Setup
 
