@@ -7,26 +7,16 @@
     "start": "nodemon index.js",
     "test": "eslint --ignore-path .eslintignore ."
   },
-  "author": "cmcneese@chef.io",
+  "author": "",
   "license": "ISC",
   "dependencies": {
-    "@hapi/basic": "^6.0.0",
-    "@hapi/boom": "^9.1.4",
-    "@hapi/hapi": "^20.1.5",
-    "@hapi/inert": "^6.0.4",
-    "@hapi/vision": "^6.1.0",
-    "bcrypt": "^5.0.1",
     "dotenv": "^10.0.0",
-    "hapi-auth-bearer-token": "^8.0.0",
-    "hapi-swagger": "^14.2.4",
-    "joi": "^17.4.2",
-    "json-to-pretty-yaml": "^1.2.2",
+    "express": "^4.17.1",
+    "mongoose": "^5.13.7",
+    "ndjson": "^2.0.0",
+    "ndjson-parse": "^1.0.4",
     "nodemon": "^2.0.12",
-    "npm-upgrade": "^3.0.0",
-    "sequelize": "^6.6.5",
-    "tedious": "^12.2.0",
-    "pg": "^8.7.1",
-    "pg-hstore": "^2.3.4"
+    "npm-upgrade": "^3.0.0"
   },
   "devDependencies": {
     "eslint": "^7.32.0",

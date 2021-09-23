@@ -4,12 +4,13 @@
 #  chef-automate config patch /path/to/datafeed.toml
 
 [data_feed_service.v1.sys]
-  [data_feed_service.v1.sys.service]
-        feed_interval = "1m"
-        node_batch_size = 30
-        updated_nodes_only = true
-        disable_cidr_filter = true
-        cidr_filter = "0.0.0.0/0"
-        accepted_status_codes = [200, 201, 202, 203, 204]
-      [data_feed_service.v1.sys.log]
-        level = "info"
+[data_feed_service.v1.sys.service]
+  feed_interval = "1m"
+  node_batch_size = 30
+  updated_nodes_only = true
+  disable_cidr_filter = true
+  cidr_filter = "0.0.0.0/0"
+  accepted_status_codes = [200, 201, 202, 203, 204]
+[data_feed_service.v1.sys.log]
+  level = "info"
+

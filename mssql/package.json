@@ -23,7 +23,6 @@
     "json-to-pretty-yaml": "^1.2.2",
     "nodemon": "^2.0.12",
     "npm-upgrade": "^3.0.0",
-    "request-promise": "^4.2.6",
     "sequelize": "^6.6.5",
     "tedious": "^12.2.0"
   },
