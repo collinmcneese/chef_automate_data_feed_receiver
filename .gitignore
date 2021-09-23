@@ -11,6 +11,7 @@ inspec.lock
 node_modules/
 *.sqlite
 local.md
+local/**/*
 
 # Created by https://www.gitignore.io/api/node,macos,windows,chefcookbook,visualstudiocode
 # Edit at https://www.gitignore.io/?templates=node,macos,windows,chefcookbook,visualstudiocode
