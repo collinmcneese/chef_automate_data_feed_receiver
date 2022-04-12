@@ -1,5 +1,7 @@
 # automate-data-feed-receiver
 
+![Status](https://github.com/collinmcneese/automate-data-feed-receiver/actions/workflows/validation.yml/badge.svg)
+
 Simple CRUD API to consume and fetch data which is sent from the Chef Automate "data feed" feature. [docs](https://docs.chef.io/automate/datafeed/)
 
 DB Backend configuration options available for:
