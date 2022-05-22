@@ -7,7 +7,7 @@
     "start": "nodemon index.js",
     "test": "eslint --ignore-path .eslintignore ."
   },
-  "author": "cmcneese@chef.io",
+  "author": "collin@mydevsandbox.com",
   "license": "ISC",
   "dependencies": {
     "@hapi/basic": "^6.0.0",
