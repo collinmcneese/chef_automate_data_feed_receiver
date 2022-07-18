@@ -14,7 +14,7 @@
     "@hapi/boom": "^10.0.0",
     "@hapi/hapi": "^20.2.1",
     "@hapi/inert": "^6.0.5",
-    "@hapi/vision": "^6.1.0",
+    "@hapi/vision": "^7.0.0",
     "bcrypt": "^5.0.1",
     "dotenv": "^16.0.0",
     "hapi-auth-bearer-token": "^8.0.0",
