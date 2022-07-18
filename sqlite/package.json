@@ -12,22 +12,22 @@
   "dependencies": {
     "@hapi/basic": "^6.0.0",
     "@hapi/boom": "^10.0.0",
-    "@hapi/hapi": "^20.2.1",
-    "@hapi/inert": "^6.0.5",
-    "@hapi/vision": "^6.1.0",
+    "@hapi/hapi": "^20.2.2",
+    "@hapi/inert": "^7.0.0",
+    "@hapi/vision": "^7.0.0",
     "bcrypt": "^5.0.1",
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.1",
     "hapi-auth-bearer-token": "^8.0.0",
-    "hapi-swagger": "^14.2.5",
+    "hapi-swagger": "^14.5.5",
     "joi": "^17.6.0",
     "json-to-pretty-yaml": "^1.2.2",
-    "nodemon": "^2.0.15",
+    "nodemon": "^2.0.19",
     "npm-upgrade": "^3.1.0",
-    "sequelize": "^6.19.0",
-    "sqlite3": "^5.0.2"
+    "sequelize": "^6.21.3",
+    "sqlite3": "^5.0.9"
   },
   "devDependencies": {
-    "eslint": "^8.13.0",
+    "eslint": "^8.20.0",
     "eslint-config-strongloop": "^2.1.0"
   }
 }
